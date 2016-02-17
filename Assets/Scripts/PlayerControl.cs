@@ -24,6 +24,8 @@ public class PlayerControl : MonoBehaviour
     private float speedStore;
     private float speedMilestoneCountStore;
     private float speedIncMilestoneStore;
+    private bool stoppedJumping;
+    private bool canDoubleJump;
     // Use this for initialization
     void Start ()
     {
@@ -36,6 +38,8 @@ public class PlayerControl : MonoBehaviour
         speedStore = moveSpeed;
         speedMilestoneCountStore = speedMilestoneCount;
         speedIncMilestoneStore = speedIncMilestone;
+        stoppedJumping = true;
+        canDoubleJump = true;
     }
 
     // Update is called once per frame
@@ -53,11 +57,22 @@ public class PlayerControl : MonoBehaviour
         }
         body.velocity = new Vector2(moveSpeed, body.velocity.y);
 
-        if ((Input.GetKeyDown(KeyCode.Space) /*|| Input.GetMouseButtonDown(0)*/) && grounded)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)))
         {
-            body.velocity = new Vector2(body.velocity.x, jumpForce);
+            if (grounded)
+            {
+                body.velocity = new Vector2(body.velocity.x, jumpForce);
+                stoppedJumping = false;
+            }
+            if (!grounded && canDoubleJump)
+            {
+                canDoubleJump = false;
+                stoppedJumping = false;
+                body.velocity = new Vector2(body.velocity.x, jumpForce);
+                jumpTimeCounter = jumpTime;
+            }
         }
-        if(Input.GetKey(KeyCode.Space) /*|| Input.GetMouseButton(0)*/)
+        if((Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0)) && !stoppedJumping)
         {
             if(jumpTimeCounter > 0.0f)
             {
@@ -65,13 +80,15 @@ public class PlayerControl : MonoBehaviour
                 jumpTimeCounter -= Time.deltaTime;
             }
         }
-        if (Input.GetKeyUp(KeyCode.Space) /*|| Input.GetMouseButtonUp(0)*/)
+        if (Input.GetKeyUp(KeyCode.Space) || Input.GetMouseButtonUp(0))
         {
             jumpTimeCounter = 0;
+            stoppedJumping = true;
         }
         if (grounded)
         {
             jumpTimeCounter = jumpTime;
+            canDoubleJump = true;
         }
 
         animator.SetFloat("Speed", body.velocity.x);
