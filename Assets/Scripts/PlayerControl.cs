@@ -8,17 +8,21 @@ public class PlayerControl : MonoBehaviour
     public float jumpForce;
     public bool grounded;
     public LayerMask groundLayer;
-
+    public float jumpTime;
+    
     private Rigidbody2D body;
     private Collider2D collider;
     private Animator animator;
+    private float jumpTimeCounter;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         body = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
+
+        jumpTimeCounter = jumpTime;
 	}
 	
 	// Update is called once per frame
@@ -31,6 +35,23 @@ public class PlayerControl : MonoBehaviour
         {
             body.velocity = new Vector2(body.velocity.x, jumpForce);
         }
+        if(Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0))
+        {
+            if(jumpTimeCounter > 0.0f)
+            {
+                body.velocity = new Vector2(body.velocity.x, jumpForce);
+                jumpTimeCounter -= Time.deltaTime;
+            }
+        }
+        if (Input.GetKeyUp(KeyCode.Space) || Input.GetMouseButtonUp(0))
+        {
+            jumpTimeCounter = 0;
+        }
+        if (grounded)
+        {
+            jumpTimeCounter = jumpTime;
+        }
+
         animator.SetFloat("Speed", body.velocity.x);
         animator.SetBool("Grounded", grounded);
 

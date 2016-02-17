@@ -3,24 +3,33 @@ using System.Collections;
 
 public class PlatformGenerator : MonoBehaviour {
 
-    // public ObjectPooler pooler;
-    public GameObject[] platforms;
+    public ObjectPooler[] poolers;
     public Transform generationPoint;
+    public Transform maxHeightPoint;
+
     public float distanceBetweenMin;
     public float distanceBetweenMax;
+    public float maxHeightChange;
 
     private float distanceBetween;
     private int platformSelector;
     private float[] platformWidths;
+    private float minHeight;
+    private float maxHeight;
+    private float heightChange;
+    
 
     // Use this for initialization
     void Start ()
     {
-        platformWidths = new float[platforms.Length];
-        for(int i = 0; i < platforms.Length; i++)
+        platformWidths = new float[poolers.Length];
+        for(int i = 0; i < poolers.Length; i++)
         {
-            platformWidths[i] = platforms[i].GetComponent<BoxCollider2D>().size.x;
+            platformWidths[i] = poolers[i].pooledObject.GetComponent<BoxCollider2D>().size.x;
         }
+
+        minHeight = transform.position.y;
+        maxHeight = maxHeightPoint.position.y;
 	}
 	
 	// Update is called once per frame
@@ -28,15 +37,18 @@ public class PlatformGenerator : MonoBehaviour {
     {
 	    if(transform.position.x < generationPoint.position.x)
         {
-            platformSelector = Random.Range(0, platforms.Length - 1);
+            platformSelector = Random.Range(0, poolers.Length - 1);
             distanceBetween = Random.Range(distanceBetweenMin, distanceBetweenMax);
-            transform.position = new Vector3(transform.position.x + platformWidths[platformSelector] + distanceBetween, transform.position.y, transform.position.z);
-            Instantiate(platforms[platformSelector], transform.position, transform.rotation);
+            heightChange = transform.position.y + Random.Range(maxHeightChange, -maxHeightChange);
+            heightChange = Mathf.Clamp(heightChange, minHeight, maxHeight);
+            transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2) + distanceBetween, heightChange, transform.position.z);
 
-            //var pooledObject = pooler.GetPooledObject();
-            //pooledObject.transform.position = transform.position;
-            //pooledObject.transform.rotation = transform.rotation;
-            //pooledObject.SetActive(true);
+            var pooledObject = poolers[platformSelector].GetPooledObject();
+            pooledObject.transform.position = transform.position;
+            pooledObject.transform.rotation = transform.rotation;
+            pooledObject.SetActive(true);
+
+            transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2), transform.position.y, transform.position.z);
         }
 	}
 }
