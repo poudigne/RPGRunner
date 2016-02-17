@@ -14,11 +14,16 @@ public class PlayerControl : MonoBehaviour
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius;
-    
+    public GameController gameController; 
+
     private Rigidbody2D body;
     private Animator animator;
     private float jumpTimeCounter;
     private float speedMilestoneCount;
+
+    private float speedStore;
+    private float speedMilestoneCountStore;
+    private float speedIncMilestoneStore;
     // Use this for initialization
     void Start ()
     {
@@ -27,11 +32,17 @@ public class PlayerControl : MonoBehaviour
 
         jumpTimeCounter = jumpTime;
         speedMilestoneCount = speedIncMilestone;
+
+        speedStore = moveSpeed;
+        speedMilestoneCountStore = speedMilestoneCount;
+        speedIncMilestoneStore = speedIncMilestone;
     }
 
     // Update is called once per frame
     void Update ()
     {
+        if (Time.timeScale < 1)
+            return;
         //grounded = Physics2D.IsTouchingLayers(collider, groundLayer);
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         if(transform.position.x > speedMilestoneCount)
@@ -42,11 +53,11 @@ public class PlayerControl : MonoBehaviour
         }
         body.velocity = new Vector2(moveSpeed, body.velocity.y);
 
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) && grounded)
+        if ((Input.GetKeyDown(KeyCode.Space) /*|| Input.GetMouseButtonDown(0)*/) && grounded)
         {
             body.velocity = new Vector2(body.velocity.x, jumpForce);
         }
-        if(Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0))
+        if(Input.GetKey(KeyCode.Space) /*|| Input.GetMouseButton(0)*/)
         {
             if(jumpTimeCounter > 0.0f)
             {
@@ -54,7 +65,7 @@ public class PlayerControl : MonoBehaviour
                 jumpTimeCounter -= Time.deltaTime;
             }
         }
-        if (Input.GetKeyUp(KeyCode.Space) || Input.GetMouseButtonUp(0))
+        if (Input.GetKeyUp(KeyCode.Space) /*|| Input.GetMouseButtonUp(0)*/)
         {
             jumpTimeCounter = 0;
         }
@@ -65,6 +76,16 @@ public class PlayerControl : MonoBehaviour
 
         animator.SetFloat("Speed", body.velocity.x);
         animator.SetBool("Grounded", grounded);
+    }
 
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "KillBox")
+        {
+            gameController.RestartGame();
+            moveSpeed = speedStore;
+            speedMilestoneCount = speedMilestoneCountStore;
+            speedIncMilestone = speedIncMilestoneStore;
+        }
     }
 }
