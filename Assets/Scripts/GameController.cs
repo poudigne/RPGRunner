@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
     public PlayerControl player;
     public DeathMenu deathScreen;
     public PauseMenu pauseScreen;
+    public bool powerupReset;
 
     private Vector3 platformStartPoint;
     private Vector3 playerStartPoint;
@@ -68,11 +69,16 @@ public class GameController : MonoBehaviour
         {
             platformList[i].gameObject.SetActive(false);
         }
+
         player.transform.position = playerStartPoint;
         platformGenerator.position = platformStartPoint;
+
         player.gameObject.SetActive(true);
+
         scoreManager.scoreCount = 0;
         scoreManager.scoreIncreasing = true;
+
+        powerupReset = true;
     }
 
     //public IEnumerator RestartGameCo()
