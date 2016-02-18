@@ -18,6 +18,7 @@ public class PlatformGenerator : MonoBehaviour {
     public float randomCoinThreshold;
     public float randomSpikeThreshold;
     public float powerupThreshold;
+    public float randomVerticalSpawnThreshold;
 
     private float distanceBetween;
     private int platformSelector;
@@ -25,9 +26,11 @@ public class PlatformGenerator : MonoBehaviour {
     private float minHeight;
     private float maxHeight;
     private float heightChange;
+    private float resourceHeightChange;
+    private Vector3 lastPlatformPos = new Vector3(0,0,0);
 
     
-    private CoinGenerator coinGenerator;
+    private ResourcesGenerator coinGenerator;
 
 
 
@@ -43,7 +46,7 @@ public class PlatformGenerator : MonoBehaviour {
         minHeight = transform.position.y;
         maxHeight = maxHeightPoint.position.y;
 
-        coinGenerator = FindObjectOfType<CoinGenerator>();
+        coinGenerator = FindObjectOfType<ResourcesGenerator>();
 	}
 	
 	// Update is called once per frame
@@ -72,8 +75,16 @@ public class PlatformGenerator : MonoBehaviour {
             pooledObject.SetActive(true);
 
 
-            if (Random.Range(0f,100f) < randomCoinThreshold)
-                coinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z));
+            if(Random.Range(0f,100f) < randomCoinThreshold)
+            {
+                coinGenerator.SpawnResources(new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z), Mathf.RoundToInt(platformWidths[platformSelector]));
+            }
+            if(Random.Range(0f,100f) < randomVerticalSpawnThreshold)
+            {
+                var distance = new Vector3((pooledObject.transform.position.x + lastPlatformPos.x) / 2, (pooledObject.transform.position.y + lastPlatformPos.y) / 2, transform.position.z);
+                coinGenerator.SpawnResourcesVerticaly(distance);
+            }
+            lastPlatformPos = pooledObject.transform.position;
 
             if(Random.Range(0f,100f) < randomSpikeThreshold)
             {
@@ -86,6 +97,7 @@ public class PlatformGenerator : MonoBehaviour {
                 spike.transform.rotation = transform.rotation;
                 spike.SetActive(true);
             }
+            
             transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2), transform.position.y, transform.position.z);
         }
 	}
