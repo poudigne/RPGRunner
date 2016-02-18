@@ -15,6 +15,7 @@ public class ScoreManager : MonoBehaviour {
 
     public bool scoreIncreasing;
 
+    public bool shouldDouble;
 	// Use this for initialization
 	void Start () {
         scoreValueText.text = "0";
@@ -28,7 +29,7 @@ public class ScoreManager : MonoBehaviour {
         if (!scoreIncreasing)
             return;
         //scoreValueText.text = Mathf.RoundToInt(player.transform.position.x).ToString();
-        scoreCount += pointsPerSecond * Time.deltaTime;
+        AddScore(pointsPerSecond * Time.deltaTime);
         scoreValueText.text = "Score: " + Mathf.Round(scoreCount);
         if (scoreCount > highscoreCount)
         {
@@ -38,8 +39,10 @@ public class ScoreManager : MonoBehaviour {
         highscoreValueText.text = "High score: " + Mathf.RoundToInt(highscoreCount);
     }
 
-    public void AddScore(int amount)
+    public void AddScore(float amount)
     {
-        scoreCount += 100;
+        if (shouldDouble)
+            amount *= 2;
+        scoreCount += amount;
     }
 }

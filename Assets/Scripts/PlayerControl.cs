@@ -14,7 +14,9 @@ public class PlayerControl : MonoBehaviour
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius;
-    public GameController gameController; 
+    public GameController gameController;
+    public AudioSource jumpSound;
+    public AudioSource deathSound;
 
     private Rigidbody2D body;
     private Animator animator;
@@ -40,6 +42,8 @@ public class PlayerControl : MonoBehaviour
         speedIncMilestoneStore = speedIncMilestone;
         stoppedJumping = true;
         canDoubleJump = true;
+        jumpSound.volume = 0.4f;
+        deathSound.volume = 0.4f;
     }
 
     // Update is called once per frame
@@ -63,6 +67,7 @@ public class PlayerControl : MonoBehaviour
             {
                 body.velocity = new Vector2(body.velocity.x, jumpForce);
                 stoppedJumping = false;
+                jumpSound.Play();
             }
             if (!grounded && canDoubleJump)
             {
@@ -70,6 +75,7 @@ public class PlayerControl : MonoBehaviour
                 stoppedJumping = false;
                 body.velocity = new Vector2(body.velocity.x, jumpForce);
                 jumpTimeCounter = jumpTime;
+                jumpSound.Play();
             }
         }
         if((Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0)) && !stoppedJumping)
@@ -99,6 +105,8 @@ public class PlayerControl : MonoBehaviour
     {
         if (other.gameObject.tag == "KillBox")
         {
+            
+            deathSound.Play();
             gameController.RestartGame();
             moveSpeed = speedStore;
             speedMilestoneCount = speedMilestoneCountStore;

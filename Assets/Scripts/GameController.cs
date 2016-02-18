@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour
 
     private Vector3 platformStartPoint;
     private Vector3 playerStartPoint;
-    private bool isPaused = false;
+
     private PlatformDestroyer[] platformList;
     private ScoreManager scoreManager;
     
@@ -46,11 +46,8 @@ public class GameController : MonoBehaviour
         {
             pauseScreen.TogglePause();
         }
-            
     }
 
-    
-    
     public void RestartGame()
     {
         scoreManager.scoreIncreasing = false;
